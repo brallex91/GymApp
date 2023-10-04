@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Card, Paragraph, Title } from "react-native-paper";
@@ -7,9 +8,14 @@ import {
   getLocalExercises,
 } from "../services/exerciseService";
 import { Exercise } from "../types/exercise";
+import { formatMuscleName, truncateString } from "../utils/textFormat";
 
 const HomeScreen: React.FC = () => {
   const [savedExercises, setSavedExercises] = useState<Exercise[] | []>([]);
+
+  const [loaded] = useFonts({
+    RobotoRegular: require("../assets/fonts/Roboto-Regular.ttf"),
+  });
 
   const fetchSavedExercises = async () => {
     try {
@@ -35,6 +41,10 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <ScrollView>
       <TouchableOpacity
@@ -46,11 +56,17 @@ const HomeScreen: React.FC = () => {
       {savedExercises.map((exercise, index) => (
         <Card key={index} style={styles.card}>
           <Card.Content>
-            <Title>{exercise.name}</Title>
-            <Paragraph>Type: {exercise.type}</Paragraph>
-            <Paragraph>Muscle: {exercise.muscle}</Paragraph>
-            <Paragraph>Equipment: {exercise.equipment}</Paragraph>
-            <Paragraph>Difficulty: {exercise.difficulty}</Paragraph>
+            <Title style={{ fontFamily: "RobotoRegular" }}>
+              {truncateString(exercise.name, 30)}
+            </Title>
+            <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
+            <Paragraph>Muscle: {formatMuscleName(exercise.muscle)}</Paragraph>
+            <Paragraph>
+              Equipment: {formatMuscleName(exercise.equipment)}
+            </Paragraph>
+            <Paragraph>
+              Difficulty: {formatMuscleName(exercise.difficulty)}
+            </Paragraph>
           </Card.Content>
         </Card>
       ))}

@@ -1,3 +1,4 @@
+import { useFocusEffect } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -13,30 +14,14 @@ import {
 } from "react-native-paper";
 import ExerciseCard from "../components/ExerciseCard";
 import { useFetchExerciseFromApi } from "../hooks/useFetchExerciseFromApi";
-
-export const muscleOptions = [
-  { value: "abdominals", label: "Abdominals" },
-  { value: "abductors", label: "Abductors" },
-  { value: "adductors", label: "Adductors" },
-  { value: "biceps", label: "Biceps" },
-  { value: "calves", label: "Calves" },
-  { value: "chest", label: "Chest" },
-  { value: "forearms", label: "Forearms" },
-  { value: "glutes", label: "Glutes" },
-  { value: "hamstrings", label: "Hamstrings" },
-  { value: "lats", label: "Lats" },
-  { value: "lower_back", label: "Lower Back" },
-  { value: "middle_back", label: "Middle Back" },
-  { value: "neck", label: "Neck" },
-  { value: "quadriceps", label: "Quadriceps" },
-  { value: "traps", label: "Traps" },
-  { value: "triceps", label: "Triceps" },
-];
+import { getLocalExercises } from "../services/exerciseService";
+import { muscleOptions } from "../utils/textFormat";
 
 const ExerciseScreen: React.FC = () => {
   const [muscleMenuVisible, setMuscleMenuVisible] = useState(false);
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [exercises, setExercises] = useState<any[]>([]);
+  const [isLikedExercises, setIsLikedExercises] = useState<string[]>([]);
 
   const showMuscleMenu = () => {
     setMuscleMenuVisible(true);
@@ -58,10 +43,35 @@ const ExerciseScreen: React.FC = () => {
     setExercises(exercisesData);
   };
 
+  const updateLikedExercises = async () => {
+    try {
+      const localExercises = await getLocalExercises();
+      const likedExerciseNames = localExercises.map(
+        (localExercise) => localExercise.name
+      );
+      setIsLikedExercises(likedExerciseNames);
+    } catch (error) {
+      console.error("Error checking liked exercises:", error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchAndSetExercises();
+    }, [selectedMuscle])
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      updateLikedExercises();
+    }, [])
+  );
+
   return (
     <PaperProvider theme={customTheme}>
       <View
         style={{
+          flex: 1,
           padding: 5,
           flexDirection: "column",
           justifyContent: "center",
@@ -101,11 +111,17 @@ const ExerciseScreen: React.FC = () => {
           <Text style={styles.buttonText}>Find Exercises</Text>
         </TouchableOpacity>
 
-        <ScrollView>
-          {exercises.map((exercise, index) => (
-            <ExerciseCard key={index} exercise={exercise} />
-          ))}
-        </ScrollView>
+        <View style={{ flex: 1 }}>
+          <ScrollView>
+            {exercises.map((exercise, index) => (
+              <ExerciseCard
+                key={index}
+                exercise={exercise}
+                isLiked={isLikedExercises.includes(exercise.name)}
+              />
+            ))}
+          </ScrollView>
+        </View>
       </View>
     </PaperProvider>
   );

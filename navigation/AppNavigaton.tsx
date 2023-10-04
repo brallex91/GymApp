@@ -14,20 +14,20 @@ function BottomTabNavigator() {
   return (
     <Tab.Navigator initialRouteName="Home">
       <Tab.Screen
-        name="Home"
+        name="My Exercises"
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Entypo name="home" size={size} color={color} />
+            <Entypo name="heart" size={size} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="Exercise"
+        name="Database"
         component={ExerciseScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Entypo name="text-document-inverted" size={size} color={color} />
+            <Entypo name="database" size={size} color={color} />
           ),
         }}
       />
