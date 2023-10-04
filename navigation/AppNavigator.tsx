@@ -17,7 +17,7 @@ function RootNavigator() {
   return (
     <Stack.Navigator initialRouteName="Root">
       <Stack.Screen
-        name="Root"
+        name=" "
         component={BottomNav}
         options={{
           headerShown: true,

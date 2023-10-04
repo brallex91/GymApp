@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "react-native";
+import { Text } from "react-native-paper";
 
 const HomeScreen: React.FC = () => {
   return <Text>This is HomeScreen</Text>;
