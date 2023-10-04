@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
 import ExerciseCard from "../components/ExerciseCard";
 import { Exercise } from "../types/exercise";
 import { generateRandomId } from "../utils/idGenerator";
@@ -21,6 +22,18 @@ export const storeLocalExercise = async (
   try {
     const existingExercises = await getLocalExercises();
 
+    const existingExercise = existingExercises.find(
+      (item) => item.name === exerciseCard.name
+    );
+
+    if (existingExercise) {
+      Alert.alert(
+        "Exercise Already Exists",
+        "This exercise already exists in your list."
+      );
+      return;
+    }
+
     const exercise: Exercise = {
       id: generateRandomId(),
       name: exerciseCard.name,
@@ -33,15 +46,7 @@ export const storeLocalExercise = async (
       reps: 0,
     };
 
-    const index = existingExercises.findIndex(
-      (item) => item.id === exercise.id
-    );
-
-    if (index !== -1) {
-      existingExercises[index] = exercise;
-    } else {
-      existingExercises.push(exercise);
-    }
+    existingExercises.push(exercise);
 
     await AsyncStorage.setItem(
       LOCAL_EXERCISES_KEY,

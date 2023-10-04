@@ -1,52 +1,80 @@
-import { Entypo } from "@expo/vector-icons";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import React from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
-import { Button, Card } from "react-native-paper";
-import { useWorkouts } from "../hooks/useWorkouts";
-import { deleteWorkout } from "../services/workoutServices";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Card, Paragraph, Title } from "react-native-paper";
+import {
+  clearLocalExercises,
+  getLocalExercises,
+} from "../services/exerciseService";
+import { Exercise } from "../types/exercise";
 
-export default function HomeScreen() {
-  const navigation = useNavigation<any>();
-  const { workouts, refreshWorkouts } = useWorkouts();
+const HomeScreen: React.FC = () => {
+  const [savedExercises, setSavedExercises] = useState<Exercise[] | []>([]);
 
-  const handleCreateWorkoutPress = () => {
-    navigation.navigate("CreateWorkout");
+  const fetchSavedExercises = async () => {
+    try {
+      const localExercises = await getLocalExercises();
+      setSavedExercises(localExercises);
+    } catch (error) {
+      console.error("Error fetching saved exercises:", error);
+    }
   };
 
   useFocusEffect(
     React.useCallback(() => {
-      refreshWorkouts();
+      fetchSavedExercises();
     }, [])
   );
 
-  const handleDeleteWorkout = async (workoutId: string) => {
+  const handleClearExercises = async () => {
     try {
-      await deleteWorkout(workoutId);
-      refreshWorkouts();
+      await clearLocalExercises();
+      setSavedExercises([]);
     } catch (error) {
-      console.error("Error deleting workout:", error);
+      console.error("Error clearing exercises:", error);
     }
   };
 
   return (
-    <>
-      <Button mode="contained" onPress={handleCreateWorkoutPress}>
-        Create Workout
-      </Button>
-      <ScrollView>
-        {workouts.map((workout) => (
-          <Card key={workout.id}>
-            <Card.Title title={workout.name} />
-            <TouchableOpacity
-              style={{ position: "absolute", top: 10, right: 10 }}
-              onPress={() => handleDeleteWorkout(workout.id)}
-            >
-              <Entypo name="squared-cross" size={24} color="black" />
-            </TouchableOpacity>
-          </Card>
-        ))}
-      </ScrollView>
-    </>
+    <ScrollView>
+      <TouchableOpacity
+        style={styles.clearButton}
+        onPress={handleClearExercises}
+      >
+        <Text style={styles.buttonText}>Clear Exercises</Text>
+      </TouchableOpacity>
+      {savedExercises.map((exercise, index) => (
+        <Card key={index} style={styles.card}>
+          <Card.Content>
+            <Title>{exercise.name}</Title>
+            <Paragraph>Type: {exercise.type}</Paragraph>
+            <Paragraph>Muscle: {exercise.muscle}</Paragraph>
+            <Paragraph>Equipment: {exercise.equipment}</Paragraph>
+            <Paragraph>Difficulty: {exercise.difficulty}</Paragraph>
+          </Card.Content>
+        </Card>
+      ))}
+    </ScrollView>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  card: {
+    margin: 10,
+  },
+  clearButton: {
+    alignSelf: "center",
+    marginTop: 16,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    backgroundColor: "#ff6347",
+    width: 200,
+  },
+  buttonText: {
+    color: "#ffffff",
+    textAlign: "center",
+    paddingVertical: 10,
+  },
+});
+
+export default HomeScreen;

@@ -13,7 +13,6 @@ import {
 } from "react-native-paper";
 import ExerciseCard from "../components/ExerciseCard";
 import { useFetchExerciseFromApi } from "../hooks/useFetchExerciseFromApi";
-import { clearLocalExercises } from "../services/exerciseService";
 
 export const muscleOptions = [
   { value: "abdominals", label: "Abdominals" },
@@ -59,15 +58,6 @@ const ExerciseScreen: React.FC = () => {
     setExercises(exercisesData);
   };
 
-  const handleClearExercises = async () => {
-    try {
-      await clearLocalExercises();
-      setExercises([]);
-    } catch (error) {
-      console.error("Error clearing exercises:", error);
-    }
-  };
-
   return (
     <PaperProvider theme={customTheme}>
       <View
@@ -111,13 +101,6 @@ const ExerciseScreen: React.FC = () => {
           <Text style={styles.buttonText}>Find Exercises</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.clearButton}
-          onPress={handleClearExercises}
-        >
-          <Text style={styles.buttonText}>Clear Exercises</Text>
-        </TouchableOpacity>
-
         <ScrollView>
           {exercises.map((exercise, index) => (
             <ExerciseCard key={index} exercise={exercise} />
@@ -153,14 +136,6 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: "#d3d3d3",
-  },
-  clearButton: {
-    alignSelf: "center",
-    marginTop: 16,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    backgroundColor: "#ff6347",
-    width: 200,
   },
 });
 
