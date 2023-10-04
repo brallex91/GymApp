@@ -6,6 +6,7 @@ import React from "react";
 
 import ExerciseScreen from "../screens/ExerciseScreen";
 import HomeScreen from "../screens/HomeScreen";
+import MapViewScreen from "../screens/MapViewScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -28,6 +29,15 @@ function BottomTabNavigator() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Entypo name="database" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Map View"
+        component={MapViewScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Entypo name="map" size={size} color={color} />
           ),
         }}
       />

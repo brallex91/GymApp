@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -22,6 +23,7 @@ const ExerciseScreen: React.FC = () => {
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [exercises, setExercises] = useState<any[]>([]);
   const [isLikedExercises, setIsLikedExercises] = useState<string[]>([]);
+  const [fetchExercisesOnPress, setFetchExercisesOnPress] = useState(false);
 
   const showMuscleMenu = () => {
     setMuscleMenuVisible(true);
@@ -34,13 +36,17 @@ const ExerciseScreen: React.FC = () => {
   const handleMuscleSelection = (muscle: string) => {
     setSelectedMuscle(muscle);
     hideMuscleMenu();
+    setFetchExercisesOnPress(true);
   };
 
   const { fetchExercises } = useFetchExerciseFromApi(selectedMuscle);
 
   const fetchAndSetExercises = async () => {
-    const exercisesData = await fetchExercises();
-    setExercises(exercisesData);
+    if (fetchExercisesOnPress) {
+      const exercisesData = await fetchExercises();
+      setExercises(exercisesData);
+      setFetchExercisesOnPress(false);
+    }
   };
 
   const updateLikedExercises = async () => {
@@ -68,62 +74,69 @@ const ExerciseScreen: React.FC = () => {
   );
 
   return (
-    <PaperProvider theme={customTheme}>
-      <View
-        style={{
-          flex: 1,
-          padding: 5,
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        <Menu
-          visible={muscleMenuVisible}
-          onDismiss={hideMuscleMenu}
-          anchor={
-            <TouchableOpacity
-              style={[styles.button, !selectedMuscle && styles.button]}
-              onPress={showMuscleMenu}
-              disabled={muscleMenuVisible}
-            >
-              <Text style={styles.buttonText}>
-                {selectedMuscle ? selectedMuscle : "Select Muscle"}
-              </Text>
-            </TouchableOpacity>
-          }
-          contentStyle={{ maxHeight: 400 }}
+    <LinearGradient
+      style={{ flex: 1 }}
+      colors={["#FFFFFF", "#0074E4"]}
+      start={{ x: 0, y: 0.5 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <PaperProvider theme={customTheme}>
+        <View
+          style={{
+            flex: 1,
+            padding: 5,
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
         >
-          <ScrollView style={{ maxHeight: 400 }}>
-            {muscleOptions.map((muscle) => (
-              <Menu.Item
-                key={muscle.value}
-                onPress={() => handleMuscleSelection(muscle.value)}
-                title={muscle.label}
-              />
-            ))}
-          </ScrollView>
-        </Menu>
-        <TouchableOpacity
-          style={[styles.button, !selectedMuscle && styles.disabledButton]}
-          onPress={fetchAndSetExercises}
-          disabled={!selectedMuscle}
-        >
-          <Text style={styles.buttonText}>Find Exercises</Text>
-        </TouchableOpacity>
+          <Menu
+            visible={muscleMenuVisible}
+            onDismiss={hideMuscleMenu}
+            anchor={
+              <TouchableOpacity
+                style={[styles.button, !selectedMuscle && styles.button]}
+                onPress={showMuscleMenu}
+                disabled={muscleMenuVisible}
+              >
+                <Text style={styles.buttonText}>
+                  {selectedMuscle ? selectedMuscle : "Select Muscle"}
+                </Text>
+              </TouchableOpacity>
+            }
+            contentStyle={{ maxHeight: 400 }}
+          >
+            <ScrollView style={{ maxHeight: 400 }}>
+              {muscleOptions.map((muscle) => (
+                <Menu.Item
+                  key={muscle.value}
+                  onPress={() => handleMuscleSelection(muscle.label)}
+                  title={muscle.label}
+                />
+              ))}
+            </ScrollView>
+          </Menu>
+          <TouchableOpacity
+            style={[styles.button, !selectedMuscle && styles.disabledButton]}
+            onPress={fetchAndSetExercises}
+            disabled={!selectedMuscle}
+          >
+            <Text style={styles.buttonText}>Find Exercises</Text>
+          </TouchableOpacity>
 
-        <View style={{ flex: 1 }}>
-          <ScrollView>
-            {exercises.map((exercise, index) => (
-              <ExerciseCard
-                key={index}
-                exercise={exercise}
-                isLiked={isLikedExercises.includes(exercise.name)}
-              />
-            ))}
-          </ScrollView>
+          <View style={{ flex: 1 }}>
+            <ScrollView>
+              {exercises.map((exercise, index) => (
+                <ExerciseCard
+                  key={index}
+                  exercise={exercise}
+                  isLiked={isLikedExercises.includes(exercise.name)}
+                />
+              ))}
+            </ScrollView>
+          </View>
         </View>
-      </View>
-    </PaperProvider>
+      </PaperProvider>
+    </LinearGradient>
   );
 };
 
