@@ -20,6 +20,7 @@ Text
 Button
 StyleSheet
 ScrollView
+Alert
 TouchableOpacity
 
 Använda Expo Komponenter:
@@ -28,10 +29,12 @@ Checkbox
 Audio
 MapView
 AsyncStorage
-Alert
+StatusBar
+KeepAwake
+UseFonts
 
 Andra Externa Komponenter:
-Jag har använt mig av React Native Paper för att designa en stor del av UI i mitt projekt.
+Jag har använt mig av en hel del React Native Paper-Komponenter för att designa en stor del av UI i mitt projekt.
 
 Web-API:
 Min applikation skickar fetch requests till ett api som finns på https://api-ninjas.com/api/exercises
