@@ -1,7 +1,3 @@
-import { useFocusEffect } from "@react-navigation/native";
-import Checkbox from "expo-checkbox";
-import { useFonts } from "expo-font";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -11,6 +7,10 @@ import {
   View,
 } from "react-native";
 import { Card, Paragraph, Title } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
+import Checkbox from "expo-checkbox";
+import { useFonts } from "expo-font";
 
 import {
   clearLocalExercises,
@@ -20,9 +20,14 @@ import { Exercise } from "../types/exercise";
 import { formatMuscleName, truncateString } from "../utils/textFormat";
 import { useButtonSound } from "../hooks/useButtonSound";
 
+import ExerciseDetailsCard from "../components/ExerciseDetails";
+
 const HomeScreen: React.FC = () => {
   const [savedExercises, setSavedExercises] = useState<Exercise[] | []>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [exerciseDetailsVisible, setExerciseDetailsVisible] = useState(false);
+  const [selectedExerciseInstruction, setSelectedExerciseInstruction] =
+    useState("");
 
   const playButtonSound = useButtonSound();
 
@@ -71,6 +76,15 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  const handleExerciseCardPress = (exercise: any) => {
+    setSelectedExerciseInstruction(exercise.instructions);
+    setExerciseDetailsVisible(true);
+  };
+
+  const hideExerciseDetails = () => {
+    setExerciseDetailsVisible(false);
+  };
+
   if (!loaded) {
     return null;
   }
@@ -100,35 +114,48 @@ const HomeScreen: React.FC = () => {
       </TouchableOpacity>
       <ScrollView>
         {savedExercises.map((exercise, index) => (
-          <Card key={index} style={styles.card}>
-            <Card.Content>
-              <View style={styles.cardContent}>
-                <View style={styles.cardText}>
-                  <Title style={{ fontFamily: "RobotoRegular" }}>
-                    {truncateString(exercise.name, 30)}
-                  </Title>
-                  <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
-                  <Paragraph>
-                    Muscle: {formatMuscleName(exercise.muscle)}
-                  </Paragraph>
-                  <Paragraph>
-                    Equipment: {formatMuscleName(exercise.equipment)}
-                  </Paragraph>
-                  <Paragraph>
-                    Difficulty: {formatMuscleName(exercise.difficulty)}
-                  </Paragraph>
+          <TouchableOpacity
+            key={index}
+            onPress={() => handleExerciseCardPress(exercise)}
+          >
+            <Card style={styles.card}>
+              <Card.Content>
+                <View style={styles.cardContent}>
+                  <View style={styles.cardText}>
+                    <Title style={{ fontFamily: "RobotoRegular" }}>
+                      {truncateString(exercise.name, 30)}
+                    </Title>
+                    <Paragraph>
+                      Type: {formatMuscleName(exercise.type)}
+                    </Paragraph>
+                    <Paragraph>
+                      Muscle: {formatMuscleName(exercise.muscle)}
+                    </Paragraph>
+                    <Paragraph>
+                      Equipment: {formatMuscleName(exercise.equipment)}
+                    </Paragraph>
+                    <Paragraph>
+                      Difficulty: {formatMuscleName(exercise.difficulty)}
+                    </Paragraph>
+                  </View>
+                  <View style={styles.checkBoxContainer}>
+                    <Checkbox
+                      value={selectedExercises.includes(exercise.id)}
+                      onValueChange={() => toggleExerciseSelection(exercise.id)}
+                      style={{ width: 30, height: 30 }}
+                    />
+                  </View>
                 </View>
-                <View style={styles.checkBoxContainer}>
-                  <Checkbox
-                    value={selectedExercises.includes(exercise.id)}
-                    onValueChange={() => toggleExerciseSelection(exercise.id)}
-                  />
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
         ))}
       </ScrollView>
+      <ExerciseDetailsCard
+        visible={exerciseDetailsVisible}
+        onClose={hideExerciseDetails}
+        instruction={selectedExerciseInstruction}
+      />
     </LinearGradient>
   );
 };

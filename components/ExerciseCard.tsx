@@ -43,7 +43,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise }) => {
       <Card.Content style={styles.cardContent}>
         <View>
           <Title style={{ fontFamily: "RobotoRegular" }}>
-            {truncateString(exercise.name, 30)}
+            {truncateString(exercise.name, 20)}
           </Title>
           <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
           <Paragraph>Muscle: {formatMuscleName(exercise.muscle)}</Paragraph>

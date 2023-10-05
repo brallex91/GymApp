@@ -1,5 +1,3 @@
-import { useFocusEffect } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   ScrollView,
@@ -9,16 +7,23 @@ import {
   View,
 } from "react-native";
 import { Menu } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
 
 import ExerciseCard from "../components/ExerciseCard";
 import { useFetchExerciseFromApi } from "../hooks/useFetchExerciseFromApi";
 import { muscleOptions } from "../utils/textFormat";
 import { useButtonSound } from "../hooks/useButtonSound";
+import ExerciseDetails from "../components/ExerciseDetails";
 
 const ExerciseScreen: React.FC = () => {
   const [muscleMenuVisible, setMuscleMenuVisible] = useState(false);
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [exercises, setExercises] = useState<any[]>([]);
+  const [exerciseDetailsVisible, setExerciseDetailsVisible] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+
   const playButtonSound = useButtonSound();
 
   const showMuscleMenu = () => {
@@ -41,6 +46,15 @@ const ExerciseScreen: React.FC = () => {
       const exercisesData = await fetchExercises();
       setExercises(exercisesData);
     }
+  };
+
+  const handleExerciseCardPress = (exercise: any) => {
+    setSelectedExercise(exercise);
+    setModalVisible(true);
+  };
+
+  const hideExerciseDetails = () => {
+    setExerciseDetailsVisible(false);
   };
 
   return (
@@ -93,10 +107,21 @@ const ExerciseScreen: React.FC = () => {
       <View style={{ flex: 1 }}>
         <ScrollView>
           {exercises.map((exercise, index) => (
-            <ExerciseCard key={index} exercise={exercise} />
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleExerciseCardPress(exercise)}
+            >
+              <ExerciseCard exercise={exercise} />
+            </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
+
+      <ExerciseDetails
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        instruction={selectedExercise ? selectedExercise.instructions : ""}
+      />
     </LinearGradient>
   );
 };
