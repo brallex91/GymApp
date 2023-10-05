@@ -2,7 +2,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Card, Paragraph, Title } from "react-native-paper";
 import {
   clearLocalExercises,
@@ -11,9 +17,11 @@ import {
 import { Exercise } from "../types/exercise";
 import { formatMuscleName, truncateString } from "../utils/textFormat";
 import { useButtonSound } from "../hooks/useButtonSound";
+import Checkbox from "expo-checkbox";
 
 const HomeScreen: React.FC = () => {
   const [savedExercises, setSavedExercises] = useState<Exercise[] | []>([]);
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]); // En lista med ids för markerade övningar
 
   const playButtonSound = useButtonSound();
 
@@ -36,10 +44,33 @@ const HomeScreen: React.FC = () => {
     }, [])
   );
 
+  const toggleExerciseSelection = (exerciseId: string) => {
+    // Funktion för att markera/avmarkera övningar
+    if (selectedExercises.includes(exerciseId)) {
+      setSelectedExercises(selectedExercises.filter((id) => id !== exerciseId));
+    } else {
+      setSelectedExercises([...selectedExercises, exerciseId]);
+    }
+  };
+
   const handleClearExercises = async () => {
     try {
-      await clearLocalExercises();
-      setSavedExercises([]);
+      // Extract IDs of selected exercises
+      const selectedExerciseIds = selectedExercises;
+
+      // Filtrera de sparade övningarna och behåll endast de som inte är markerade
+      const exercisesToKeep = savedExercises.filter(
+        (exercise) => !selectedExerciseIds.includes(exercise.id)
+      );
+
+      // Ta bort de markerade övningarna från AsyncStorage
+      await clearLocalExercises(selectedExerciseIds);
+
+      // Uppdatera listan över sparade övningar
+      setSavedExercises(exercisesToKeep);
+
+      // Återställ markerade övningar
+      setSelectedExercises([]);
     } catch (error) {
       console.error("Error clearing exercises:", error);
     }
@@ -69,17 +100,29 @@ const HomeScreen: React.FC = () => {
         {savedExercises.map((exercise, index) => (
           <Card key={index} style={styles.card}>
             <Card.Content>
-              <Title style={{ fontFamily: "RobotoRegular" }}>
-                {truncateString(exercise.name, 30)}
-              </Title>
-              <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
-              <Paragraph>Muscle: {formatMuscleName(exercise.muscle)}</Paragraph>
-              <Paragraph>
-                Equipment: {formatMuscleName(exercise.equipment)}
-              </Paragraph>
-              <Paragraph>
-                Difficulty: {formatMuscleName(exercise.difficulty)}
-              </Paragraph>
+              <View style={styles.cardContent}>
+                <View style={styles.cardText}>
+                  <Title style={{ fontFamily: "RobotoRegular" }}>
+                    {truncateString(exercise.name, 30)}
+                  </Title>
+                  <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
+                  <Paragraph>
+                    Muscle: {formatMuscleName(exercise.muscle)}
+                  </Paragraph>
+                  <Paragraph>
+                    Equipment: {formatMuscleName(exercise.equipment)}
+                  </Paragraph>
+                  <Paragraph>
+                    Difficulty: {formatMuscleName(exercise.difficulty)}
+                  </Paragraph>
+                </View>
+                <View style={styles.checkBoxContainer}>
+                  <Checkbox
+                    value={selectedExercises.includes(exercise.id)}
+                    onValueChange={() => toggleExerciseSelection(exercise.id)}
+                  />
+                </View>
+              </View>
             </Card.Content>
           </Card>
         ))}
@@ -104,6 +147,24 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     textAlign: "center",
     paddingVertical: 10,
+  },
+  exerciseItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  cardText: {
+    flex: 1,
+  },
+  checkBoxContainer: {
+    alignSelf: "flex-end",
+    marginRight: 20,
+    marginBottom: 50,
   },
 });
 

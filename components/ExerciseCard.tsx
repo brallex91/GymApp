@@ -1,13 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Checkbox } from "expo-checkbox";
-import { useFonts } from "expo-font";
-import React, { useState } from "react";
-import { View } from "react-native";
+import React from "react";
 import { Card, Paragraph, Title } from "react-native-paper";
 import {
   getLocalExercises,
   storeLocalExercise,
 } from "../services/exerciseService";
+import { Entypo } from "@expo/vector-icons";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { formatMuscleName, truncateString } from "../utils/textFormat";
 
 interface ExerciseCard {
@@ -21,45 +19,29 @@ interface ExerciseCard {
 
 interface ExerciseCardProps {
   exercise: ExerciseCard;
-  isLiked: boolean;
 }
 
-const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isLiked }) => {
-  const [isLikedState, setIsLikedState] = useState(isLiked);
-
-  const [loaded] = useFonts({
-    RobotoRegular: require("../assets/fonts/Roboto-Regular.ttf"),
-  });
-
-  if (!loaded) {
-    return null;
-  }
-
-  const handleToggleExercise = async (isChecked: boolean) => {
+const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise }) => {
+  const handleSaveExercise = async () => {
     try {
-      if (isChecked) {
-        await storeLocalExercise(exercise);
-      } else {
-        const localExercises = await getLocalExercises();
-        const updatedExercises = localExercises.filter(
-          (localExercise) => localExercise.name !== exercise.name
-        );
-        await AsyncStorage.setItem(
-          "exercises",
-          JSON.stringify(updatedExercises)
-        );
-      }
-      setIsLikedState(isChecked);
+      await storeLocalExercise(exercise);
+
+      const savedExercises = await getLocalExercises();
+      const savedExerciseNames = savedExercises.map(
+        (savedExercise) => savedExercise.name
+      );
+      console.log("Saved Exercise Names:", savedExerciseNames);
     } catch (error) {
-      console.error("Error updating exercise:", error);
+      console.error("Error saving exercise:", error);
     }
   };
 
   return (
-    <Card style={{ margin: 10 }}>
+    <Card style={styles.card}>
       <Card.Content>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View style={{ flex: 1 }}>
+        <View style={styles.cardContent}>
+          <View style={styles.cardText}>
+            <Title>{exercise.name}</Title>
             <Title style={{ fontFamily: "RobotoRegular" }}>
               {truncateString(exercise.name, 30)}
             </Title>
@@ -72,16 +54,34 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isLiked }) => {
               Difficulty: {formatMuscleName(exercise.difficulty)}
             </Paragraph>
           </View>
-          <Checkbox
-            style={{ margin: 8 }}
-            value={isLikedState}
-            onValueChange={handleToggleExercise}
-            color={isLikedState ? "#4630EB" : undefined}
-          />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={handleSaveExercise}>
+              <Entypo name="heart" size={52} color="blue" />
+            </TouchableOpacity>
+          </View>
         </View>
       </Card.Content>
     </Card>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    margin: 10,
+  },
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  cardText: {
+    flex: 1,
+  },
+  buttonContainer: {
+    alignSelf: "flex-end",
+    marginRight: 20,
+    marginBottom: 35,
+  },
+});
 
 export default ExerciseCard;

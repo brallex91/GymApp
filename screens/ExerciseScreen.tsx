@@ -23,7 +23,6 @@ const ExerciseScreen: React.FC = () => {
   const [muscleMenuVisible, setMuscleMenuVisible] = useState(false);
   const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
   const [exercises, setExercises] = useState<any[]>([]);
-  const [isLikedExercises, setIsLikedExercises] = useState<string[]>([]);
   const [fetchExercisesOnPress, setFetchExercisesOnPress] = useState(false);
 
   const playButtonSound = useButtonSound();
@@ -52,28 +51,10 @@ const ExerciseScreen: React.FC = () => {
     }
   };
 
-  const updateLikedExercises = async () => {
-    try {
-      const localExercises = await getLocalExercises();
-      const likedExerciseNames = localExercises.map(
-        (localExercise) => localExercise.name
-      );
-      setIsLikedExercises(likedExerciseNames);
-    } catch (error) {
-      console.error("Error checking liked exercises:", error);
-    }
-  };
-
   useFocusEffect(
     React.useCallback(() => {
       fetchAndSetExercises();
     }, [selectedMuscle])
-  );
-
-  useFocusEffect(
-    React.useCallback(() => {
-      updateLikedExercises();
-    }, [])
   );
 
   return (
@@ -135,11 +116,7 @@ const ExerciseScreen: React.FC = () => {
           <View style={{ flex: 1 }}>
             <ScrollView>
               {exercises.map((exercise, index) => (
-                <ExerciseCard
-                  key={index}
-                  exercise={exercise}
-                  isLiked={isLikedExercises.includes(exercise.name)}
-                />
+                <ExerciseCard key={index} exercise={exercise} />
               ))}
             </ScrollView>
           </View>

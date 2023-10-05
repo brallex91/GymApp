@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
-import ExerciseCard from "../components/ExerciseCard";
 import { Exercise } from "../types/exercise";
 import { generateRandomId } from "../utils/idGenerator";
+import ExerciseCard from "../components/ExerciseCard";
 
 const LOCAL_EXERCISES_KEY = "exercises";
 
@@ -42,8 +42,6 @@ export const storeLocalExercise = async (
       equipment: exerciseCard.equipment,
       difficulty: exerciseCard.difficulty,
       instructions: exerciseCard.instructions || "",
-      sets: 0,
-      reps: 0,
     };
 
     existingExercises.push(exercise);
@@ -58,9 +56,21 @@ export const storeLocalExercise = async (
   }
 };
 
-export const clearLocalExercises = async (): Promise<void> => {
+export const clearLocalExercises = async (
+  exerciseIds: string[]
+): Promise<void> => {
   try {
-    await AsyncStorage.removeItem(LOCAL_EXERCISES_KEY);
+    const existingExercises = await getLocalExercises();
+
+    // Filtrera ut övningar med ID som inte finns i exerciseIds
+    const exercisesToKeep = existingExercises.filter(
+      (exercise) => !exerciseIds.includes(exercise.id)
+    );
+
+    await AsyncStorage.setItem(
+      LOCAL_EXERCISES_KEY,
+      JSON.stringify(exercisesToKeep)
+    );
   } catch (error) {
     console.error("Error clearing local exercises:", error);
     throw error;

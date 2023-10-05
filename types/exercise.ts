@@ -6,6 +6,4 @@ export interface Exercise {
   equipment: string;
   difficulty: string;
   instructions: string;
-  sets: number;
-  reps: number;
 }
