@@ -32,7 +32,6 @@ export function truncateString(str: string, maxLength: number) {
 export const muscleOptions = [
   { value: "abdominals", label: "Abdominals" },
   { value: "abductors", label: "Abductors" },
-  { value: "adductors", label: "Adductors" },
   { value: "biceps", label: "Biceps" },
   { value: "calves", label: "Calves" },
   { value: "chest", label: "Chest" },

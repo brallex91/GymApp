@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import Checkbox from "expo-checkbox";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
@@ -10,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { Card, Paragraph, Title } from "react-native-paper";
+
 import {
   clearLocalExercises,
   getLocalExercises,
@@ -17,11 +19,10 @@ import {
 import { Exercise } from "../types/exercise";
 import { formatMuscleName, truncateString } from "../utils/textFormat";
 import { useButtonSound } from "../hooks/useButtonSound";
-import Checkbox from "expo-checkbox";
 
 const HomeScreen: React.FC = () => {
   const [savedExercises, setSavedExercises] = useState<Exercise[] | []>([]);
-  const [selectedExercises, setSelectedExercises] = useState<string[]>([]); // En lista med ids för markerade övningar
+  const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
 
   const playButtonSound = useButtonSound();
 
@@ -45,7 +46,6 @@ const HomeScreen: React.FC = () => {
   );
 
   const toggleExerciseSelection = (exerciseId: string) => {
-    // Funktion för att markera/avmarkera övningar
     if (selectedExercises.includes(exerciseId)) {
       setSelectedExercises(selectedExercises.filter((id) => id !== exerciseId));
     } else {
@@ -55,21 +55,16 @@ const HomeScreen: React.FC = () => {
 
   const handleClearExercises = async () => {
     try {
-      // Extract IDs of selected exercises
       const selectedExerciseIds = selectedExercises;
 
-      // Filtrera de sparade övningarna och behåll endast de som inte är markerade
       const exercisesToKeep = savedExercises.filter(
         (exercise) => !selectedExerciseIds.includes(exercise.id)
       );
 
-      // Ta bort de markerade övningarna från AsyncStorage
       await clearLocalExercises(selectedExerciseIds);
 
-      // Uppdatera listan över sparade övningar
       setSavedExercises(exercisesToKeep);
 
-      // Återställ markerade övningar
       setSelectedExercises([]);
     } catch (error) {
       console.error("Error clearing exercises:", error);
@@ -87,16 +82,23 @@ const HomeScreen: React.FC = () => {
       start={{ x: 0, y: 0.5 }}
       end={{ x: 1, y: 1 }}
     >
+      <TouchableOpacity
+        style={[
+          styles.clearButton,
+          {
+            backgroundColor:
+              selectedExercises.length > 0 ? "#ff6347" : "#d3d3d3",
+          },
+        ]}
+        onPress={() => {
+          handleClearExercises();
+          playButtonSound();
+        }}
+        disabled={selectedExercises.length === 0}
+      >
+        <Text style={styles.buttonText}>Clear Selected Exercises</Text>
+      </TouchableOpacity>
       <ScrollView>
-        <TouchableOpacity
-          style={styles.clearButton}
-          onPress={() => {
-            handleClearExercises();
-            playButtonSound();
-          }}
-        >
-          <Text style={styles.buttonText}>Clear Exercises</Text>
-        </TouchableOpacity>
         {savedExercises.map((exercise, index) => (
           <Card key={index} style={styles.card}>
             <Card.Content>
@@ -134,13 +136,15 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   card: {
     margin: 10,
+    backgroundColor: "#FFD580",
   },
   clearButton: {
     alignSelf: "center",
-    marginTop: 16,
+    marginTop: 10,
+    marginBottom: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
-    backgroundColor: "#ff6347",
+    backgroundColor: "#007aff",
     width: 200,
   },
   buttonText: {
@@ -152,7 +156,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-
   cardContent: {
     flexDirection: "row",
     alignItems: "center",

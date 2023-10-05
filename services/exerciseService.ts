@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
+
 import { Exercise } from "../types/exercise";
 import { generateRandomId } from "../utils/idGenerator";
 import ExerciseCard from "../components/ExerciseCard";
@@ -62,7 +63,6 @@ export const clearLocalExercises = async (
   try {
     const existingExercises = await getLocalExercises();
 
-    // Filtrera ut övningar med ID som inte finns i exerciseIds
     const exercisesToKeep = existingExercises.filter(
       (exercise) => !exerciseIds.includes(exercise.id)
     );

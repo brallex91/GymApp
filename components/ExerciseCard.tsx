@@ -1,11 +1,13 @@
 import React from "react";
+import { Entypo } from "@expo/vector-icons";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { Card, Paragraph, Title } from "react-native-paper";
+
 import {
   getLocalExercises,
   storeLocalExercise,
 } from "../services/exerciseService";
-import { Entypo } from "@expo/vector-icons";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+
 import { formatMuscleName, truncateString } from "../utils/textFormat";
 
 interface ExerciseCard {
@@ -38,27 +40,24 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise }) => {
 
   return (
     <Card style={styles.card}>
-      <Card.Content>
-        <View style={styles.cardContent}>
-          <View style={styles.cardText}>
-            <Title>{exercise.name}</Title>
-            <Title style={{ fontFamily: "RobotoRegular" }}>
-              {truncateString(exercise.name, 30)}
-            </Title>
-            <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
-            <Paragraph>Muscle: {formatMuscleName(exercise.muscle)}</Paragraph>
-            <Paragraph>
-              Equipment: {formatMuscleName(exercise.equipment)}
-            </Paragraph>
-            <Paragraph>
-              Difficulty: {formatMuscleName(exercise.difficulty)}
-            </Paragraph>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={handleSaveExercise}>
-              <Entypo name="heart" size={52} color="blue" />
-            </TouchableOpacity>
-          </View>
+      <Card.Content style={styles.cardContent}>
+        <View>
+          <Title style={{ fontFamily: "RobotoRegular" }}>
+            {truncateString(exercise.name, 30)}
+          </Title>
+          <Paragraph>Type: {formatMuscleName(exercise.type)}</Paragraph>
+          <Paragraph>Muscle: {formatMuscleName(exercise.muscle)}</Paragraph>
+          <Paragraph>
+            Equipment: {formatMuscleName(exercise.equipment)}
+          </Paragraph>
+          <Paragraph>
+            Difficulty: {formatMuscleName(exercise.difficulty)}
+          </Paragraph>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleSaveExercise}>
+            <Entypo name="heart" size={52} color="blue" />
+          </TouchableOpacity>
         </View>
       </Card.Content>
     </Card>
@@ -68,14 +67,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise }) => {
 const styles = StyleSheet.create({
   card: {
     margin: 10,
+    backgroundColor: "#E6F7FF",
   },
   cardContent: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  cardText: {
-    flex: 1,
   },
   buttonContainer: {
     alignSelf: "flex-end",
