@@ -2,12 +2,11 @@ Titel:
 GymApp
 
 Beskrivning:
-Ett enkelt verktyg för att hämta hem olika gymövningar från ett externt api och spara dem i en lokal databas så
-att de senare är lättåtkomliga för användaren.
+Ett enkelt verktyg för att hämta hem olika gymövningar från ett externt api och spara dem i en lokal databas så att de senare är lättåtkomliga för användaren.
 
 Setup:
 Du behöver ha node.js installerat.
-Kör npm install npm@latest.
+Kör npm install.
 Kör npm update.
 För att starta i Expomiljö, kör npx expo start.
 
