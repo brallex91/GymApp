@@ -1,3 +1,6 @@
+A simple app made in React Native using TypeScript and Expo.
+A simple tool where the user can search for, store and delete gym exercises.
+
 Titel:
 GymApp
 
