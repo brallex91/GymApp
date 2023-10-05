@@ -17,6 +17,7 @@ import ExerciseCard from "../components/ExerciseCard";
 import { useFetchExerciseFromApi } from "../hooks/useFetchExerciseFromApi";
 import { getLocalExercises } from "../services/exerciseService";
 import { muscleOptions } from "../utils/textFormat";
+import { useButtonSound } from "../hooks/useButtonSound";
 
 const ExerciseScreen: React.FC = () => {
   const [muscleMenuVisible, setMuscleMenuVisible] = useState(false);
@@ -24,6 +25,8 @@ const ExerciseScreen: React.FC = () => {
   const [exercises, setExercises] = useState<any[]>([]);
   const [isLikedExercises, setIsLikedExercises] = useState<string[]>([]);
   const [fetchExercisesOnPress, setFetchExercisesOnPress] = useState(false);
+
+  const playButtonSound = useButtonSound();
 
   const showMuscleMenu = () => {
     setMuscleMenuVisible(true);
@@ -95,7 +98,10 @@ const ExerciseScreen: React.FC = () => {
             anchor={
               <TouchableOpacity
                 style={[styles.button, !selectedMuscle && styles.button]}
-                onPress={showMuscleMenu}
+                onPress={() => {
+                  showMuscleMenu();
+                  playButtonSound();
+                }}
                 disabled={muscleMenuVisible}
               >
                 <Text style={styles.buttonText}>
@@ -117,7 +123,10 @@ const ExerciseScreen: React.FC = () => {
           </Menu>
           <TouchableOpacity
             style={[styles.button, !selectedMuscle && styles.disabledButton]}
-            onPress={fetchAndSetExercises}
+            onPress={() => {
+              fetchAndSetExercises();
+              playButtonSound();
+            }}
             disabled={!selectedMuscle}
           >
             <Text style={styles.buttonText}>Find Exercises</Text>

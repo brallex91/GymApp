@@ -10,9 +10,12 @@ import {
 } from "../services/exerciseService";
 import { Exercise } from "../types/exercise";
 import { formatMuscleName, truncateString } from "../utils/textFormat";
+import { useButtonSound } from "../hooks/useButtonSound";
 
 const HomeScreen: React.FC = () => {
   const [savedExercises, setSavedExercises] = useState<Exercise[] | []>([]);
+
+  const playButtonSound = useButtonSound();
 
   const [loaded] = useFonts({
     RobotoRegular: require("../assets/fonts/Roboto-Regular.ttf"),
@@ -56,7 +59,10 @@ const HomeScreen: React.FC = () => {
       <ScrollView>
         <TouchableOpacity
           style={styles.clearButton}
-          onPress={handleClearExercises}
+          onPress={() => {
+            handleClearExercises();
+            playButtonSound();
+          }}
         >
           <Text style={styles.buttonText}>Clear Exercises</Text>
         </TouchableOpacity>
